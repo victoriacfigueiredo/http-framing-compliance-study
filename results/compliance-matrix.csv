@@ -1,0 +1,18 @@
+```csv
+RequirementID,Requirement,Nginx,HAProxy,Envoy,Traefik,Notes
+RQ-001,Invalid Content-Length Handling,Compliant,Compliant,TBD,TBD,Both rejected malformed Content-Length with 400
+RQ-002,Bare Carriage Return Handling,Compliant,Compliant,TBD,TBD,Both rejected malformed request with 400
+RQ-003,Whitespace Before First Header,Compliant,Compliant,TBD,TBD,Both rejected malformed request with 400
+RQ-004,Incomplete Content-Length Body,Compliant,Partially Observable,TBD,TBD,Current test does not fully validate timeout/incomplete body handling
+RQ-005,Chunked Transfer Coding Support,Compliant,Compliant,TBD,TBD,Both successfully processed chunked requests
+RQ-006,Large Chunk Size Handling,Needs Review,Needs Review,TBD,TBD,Current test does not fully validate overflow handling
+RQ-007,Unknown Chunk Extensions,Compliant,Compliant,TBD,TBD,Both ignored unknown chunk extensions and processed request
+RQ-008,Invalid HTTP Message Grammar,Compliant,Compliant,TBD,TBD,Both rejected invalid grammar with 400
+RQ-009,Host Header Validation,Compliant,Non-Compliant,TBD,TBD,HAProxy forwarded HTTP/1.1 request without Host header
+RQ-010,Obsolete Line Folding (obs-fold),Compliant,Different Behavior,TBD,TBD,Nginx rejected; HAProxy accepted and forwarded
+RQ-011,Unknown Transfer-Encoding,Compliant,Compliant,TBD,TBD,Nginx returned 501; HAProxy returned 400
+RQ-012,Content-Length and Transfer-Encoding Conflict,Compliant,Compliant,TBD,TBD,Different compliant handling strategies observed
+RQ-013,Transfer-Encoding in HTTP/1.0,Compliant,Potential Non-Compliance,TBD,TBD,Nginx rejected; HAProxy forwarded request
+RQ-014,Transfer-Encoding Not Ending in Chunked,Different Behavior,Compliant,TBD,TBD,Nginx returned 501 instead of expected 400
+RQ-015,Connection Close Semantics,Compliant,Compliant,TBD,TBD,Both correctly closed the connection
+```
