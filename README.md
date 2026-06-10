@@ -40,7 +40,8 @@ Planned implementations:
 │   └── echo_server.py
 │
 ├── client
-│   ├── raw_client.py
+│   ├── check_connection_reuse.py
+│   └── raw_client.py
 │
 ├── docker
 │   ├── haproxy
