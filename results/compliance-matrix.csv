@@ -1,4 +1,3 @@
-```csv
 RequirementID,Requirement,Nginx,HAProxy,Envoy,Traefik,Notes
 RQ-001,Invalid Content-Length Handling,Compliant,Compliant,TBD,TBD,Both rejected malformed Content-Length with 400
 RQ-002,Bare Carriage Return Handling,Compliant,Compliant,TBD,TBD,Both rejected malformed request with 400
@@ -15,4 +14,4 @@ RQ-012,Content-Length and Transfer-Encoding Conflict,Compliant,Compliant,TBD,TBD
 RQ-013,Transfer-Encoding in HTTP/1.0,Compliant,Potential Non-Compliance,TBD,TBD,Nginx rejected; HAProxy forwarded request
 RQ-014,Transfer-Encoding Not Ending in Chunked,Different Behavior,Compliant,TBD,TBD,Nginx returned 501 instead of expected 400
 RQ-015,Connection Close Semantics,Compliant,Compliant,TBD,TBD,Both correctly closed the connection
-```
+
