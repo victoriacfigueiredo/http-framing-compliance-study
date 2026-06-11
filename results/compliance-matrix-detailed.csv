@@ -1,4 +1,3 @@
-```csv
 RequirementID,Implementation,Status,ObservedBehavior,ExpectedBehavior,RFCSection,SecurityRelevant,Notes
 
 RQ-001,Nginx,TBD,,,,,
@@ -15,4 +14,4 @@ RQ-003,Nginx,TBD,,,,,
 RQ-003,HAProxy,TBD,,,,,
 RQ-003,Envoy,TBD,,,,,
 RQ-003,Traefik,TBD,,,,,
-```
+
