@@ -6,6 +6,9 @@ from datetime import datetime
 TARGETS = {
     "nginx": ("localhost", 8081),
     "haproxy": ("localhost", 8082),
+    "envoy": ("localhost", 8083),
+    "traefik": ("localhost", 8084),
+    "caddy": ("localhost", 8085),
 }
 
 TESTS = [

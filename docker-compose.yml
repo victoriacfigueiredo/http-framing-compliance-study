@@ -28,3 +28,34 @@ services:
       - "8082:80"
     depends_on:
       - backend
+
+  envoy:
+    image: envoyproxy/envoy:v1.31-latest
+    container_name: rfc9112-envoy
+    volumes:
+      - ./docker/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+    ports:
+      - "8083:80"
+    depends_on:
+      - backend
+
+  traefik:
+    image: traefik:v3.1
+    container_name: rfc9112-traefik
+    volumes:
+      - ./docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./docker/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    ports:
+      - "8084:80"
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:2
+    container_name: rfc9112-caddy
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    ports:
+      - "8085:80"
+    depends_on:
+      - backend
