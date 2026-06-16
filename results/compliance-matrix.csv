@@ -2,7 +2,7 @@ RequirementID,Requirement,Nginx,HAProxy,Envoy,Traefik,Caddy,Notes
 RQ-001,Invalid Content-Length Handling,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations rejected invalid Content-Length and prevented backend forwarding
 RQ-002,Bare Carriage Return Handling,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations rejected malformed requests containing bare CR characters
 RQ-003,Whitespace Before First Header,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations rejected requests containing invalid whitespace before the first header field
-RQ-004,Incomplete Content-Length Body,Review,Review,Review,Review,Review,Requires manual verification of backend forwarding behavior and connection termination semantics
+RQ-004,Incomplete Content-Length Body,Compliant,Compliant,Non-Compliant,Non-Compliant,Non-Compliant,Nginx blocked forwarding entirely; HAProxy streamed headers but detected connection reset; Envoy Traefik and Caddy allowed subsequent bytes to be consumed as part of the incomplete body
 RQ-005,Chunked Transfer Coding Support,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations successfully processed chunked requests although forwarded framing differed between implementations
 RQ-006,Large Chunk Size Handling,Review,Review,Review,Review,Review,Envoy forwarded the request while others rejected or timed out; requires manual validation against RFC expectations
 RQ-007,Unknown Chunk Extensions,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations accepted unknown chunk extensions and successfully processed the request
@@ -10,7 +10,7 @@ RQ-008,Invalid HTTP Message Grammar,Compliant,Compliant,Compliant,Compliant,Comp
 RQ-009,Host Header Validation,Compliant,Non-Compliant,Compliant,Compliant,Compliant,HAProxy forwarded an HTTP/1.1 request without a Host header to the backend application
 RQ-010,Obsolete Line Folding (obs-fold),Review,Review,Review,Review,Review,Implementations normalized or accepted obs-fold differently; RFC interpretation requires further review
 RQ-011,Unknown Transfer-Encoding,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations rejected unsupported transfer-coding values
-RQ-012,Content-Length and Transfer-Encoding Conflict,Compliant,Compliant,Compliant,Review,Review,Traefik and Caddy appeared to leave residual bytes that affected subsequent requests; manual confirmation required
+RQ-012,Content-Length and Transfer-Encoding Conflict,Compliant,Compliant,Compliant,Non-Compliant,Non-Compliant,Traefik and Caddy reused the connection after CL+TE and residual bytes contaminated the next request as HELLOGET
 RQ-013,Transfer-Encoding in HTTP/1.0,Review,Review,Review,Review,Review,Implementations adopted different normalization and rejection strategies; RFC compliance requires detailed review
 RQ-014,Transfer-Encoding Not Ending in Chunked,Review,Review,Review,Review,Review,Nginx Envoy Traefik and Caddy returned 501 while HAProxy returned 400; RFC interpretation must be reviewed
 RQ-015,Connection Close Semantics,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations correctly closed the connection when Connection: close was used

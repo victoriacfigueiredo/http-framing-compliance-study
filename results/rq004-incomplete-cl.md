@@ -96,11 +96,11 @@ The backend received:
 
 ### Analysis
 
-HAProxy forwarded the request headers to the backend before the complete request body had been received.
+HAProxy forwarded the request headers before the complete body had been received.
 
-The backend attempted to read the remaining bytes specified by the `Content-Length` header but encountered a connection reset before the body could be completed.
+The backend attempted to read the remaining bytes specified by `Content-Length` and detected a connection reset before the body could be completed.
 
-As a result, the incomplete message was not successfully processed.
+The incomplete message was therefore not successfully processed.
 
 ### Compliance Status
 
@@ -108,25 +108,129 @@ As a result, the incomplete message was not successfully processed.
 
 ### Notes
 
-The observed behavior differs from Nginx. While the incomplete request was not successfully processed, HAProxy streamed the request headers to the backend before body completion.
+HAProxy exhibits a streaming behavior that differs from Nginx. Although the request ultimately fails, the backend becomes aware of the incomplete request before the proxy detects the framing failure.
 
-Further investigation would be required to determine whether this behavior is fully consistent with the intended interpretation of RFC 9112 in reverse-proxy deployments.
+---
+
+## Envoy
+
+### Response
+
+No HTTP response was returned.
+
+### Backend Observation
+
+The backend received:
+
+```json
+{
+  "content-length": "100",
+  "body": "HELLOGET /second HTTP/1.1\r\nHost: localhost\r\n\r\n"
+}
+```
+
+### Analysis
+
+Envoy forwarded the incomplete request to the backend and continued accepting data on the connection.
+
+When a second request was transmitted on the same TCP connection, its bytes were consumed as part of the body of the original incomplete request.
+
+As a result, request boundaries became ambiguous and the backend interpreted the second request as body content belonging to the first request.
+
+### Compliance Status
+
+**Non-Compliant**
+
+### Notes
+
+The connection remained reusable after an incomplete request, directly contradicting the RFC requirement that the connection be closed once an incomplete message is detected.
+
+---
+
+## Traefik
+
+### Response
+
+No HTTP response was returned.
+
+### Backend Observation
+
+The backend received:
+
+```json
+{
+  "content-length": "100",
+  "body": "HELLOGET /second HTTP/1.1\r\nHost: localhost\r\n\r\n"
+}
+```
+
+### Analysis
+
+Traefik forwarded the incomplete request and allowed subsequent bytes on the same connection to be interpreted as part of the unfinished request body.
+
+The backend therefore consumed a complete second request as body data associated with the first request.
+
+### Compliance Status
+
+**Non-Compliant**
+
+### Notes
+
+The observed behavior demonstrates that the connection remained active despite the framing failure, violating RFC 9112 requirements.
+
+---
+
+## Caddy
+
+### Response
+
+No HTTP response was returned.
+
+### Backend Observation
+
+The backend received:
+
+```json
+{
+  "content-length": "100",
+  "body": "HELLOGET /second HTTP/1.1\r\nHost: localhost\r\n\r\n"
+}
+```
+
+### Analysis
+
+Caddy exhibited behavior similar to Traefik and Envoy.
+
+The proxy continued processing data on the connection after receiving an incomplete request body, allowing a subsequent request to become part of the body of the original request.
+
+### Compliance Status
+
+**Non-Compliant**
+
+### Notes
+
+The connection remained reusable after the incomplete request, contrary to the RFC requirement.
 
 ---
 
 ## Summary
 
-| Implementation | Response    | Backend Reached    | Compliance           |
-| -------------- | ----------- | ------------------ | -------------------- |
-| Nginx          | No Response | No                 | Compliant            |
-| HAProxy        | No Response | Yes (Headers Only) | Partially Observable |
+| Implementation | Backend Reached | Observed Behavior                        | Compliance           |
+| -------------- | --------------- | ---------------------------------------- | -------------------- |
+| Nginx          | No              | Request blocked before forwarding        | Compliant            |
+| HAProxy        | Yes             | Headers streamed, backend detected reset | Compliant |
+| Envoy          | Yes             | Subsequent request absorbed into body    | Non-Compliant        |
+| Traefik        | Yes             | Subsequent request absorbed into body    | Non-Compliant        |
+| Caddy          | Yes             | Subsequent request absorbed into body    | Non-Compliant        |
 
 ---
 
 ## Key Observation
 
-The evaluated implementations adopt different strategies when handling incomplete request bodies.
+The evaluated implementations adopt substantially different strategies when handling incomplete request bodies.
 
-Nginx blocks the incomplete request before it reaches the backend application, whereas HAProxy forwards the request headers immediately and relies on the backend connection state to detect that the body was not fully transmitted.
+Nginx blocks the request before it reaches the backend application, while HAProxy forwards request metadata and relies on downstream detection of the connection failure.
 
-Although neither implementation successfully processes the incomplete request, the difference highlights distinct forwarding behaviors that may influence backend error handling and request-processing semantics.
+More significantly, Envoy, Traefik, and Caddy continued accepting data after the incomplete request was received. In all three cases, a subsequent request transmitted on the same TCP connection was consumed as part of the body of the original request, producing ambiguous message boundaries.
+
+This behavior contradicts the RFC 9112 requirement that incomplete messages be detected and that the connection be terminated, resulting in confirmed compliance violations under the tested configurations.
