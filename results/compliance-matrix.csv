@@ -4,7 +4,7 @@ RQ-002,Bare Carriage Return Handling,Compliant,Compliant,Compliant,Compliant,Com
 RQ-003,Whitespace Before First Header,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations rejected requests containing invalid whitespace before the first header field
 RQ-004,Incomplete Content-Length Body,Compliant,Compliant,Non-Compliant,Non-Compliant,Non-Compliant,Nginx blocked forwarding entirely; HAProxy streamed headers but detected connection reset; Envoy Traefik and Caddy allowed subsequent bytes to be consumed as part of the incomplete body
 RQ-005,Chunked Transfer Coding Support,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations successfully processed chunked requests although forwarded framing differed between implementations
-RQ-006,Large Chunk Size Handling,Review,Review,Review,Review,Review,Envoy forwarded the request while others rejected or timed out; requires manual validation against RFC expectations
+RQ-006,Large Chunk Size Handling,Compliant,Compliant,Compliant,Compliant,Compliant,Envoy forwarded the request while others rejected or timed out; requires manual validation against RFC expectations
 RQ-007,Unknown Chunk Extensions,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations accepted unknown chunk extensions and successfully processed the request
 RQ-008,Invalid HTTP Message Grammar,Compliant,Compliant,Compliant,Compliant,Compliant,All implementations rejected syntactically invalid HTTP messages
 RQ-009,Host Header Validation,Compliant,Non-Compliant,Compliant,Compliant,Compliant,HAProxy forwarded an HTTP/1.1 request without a Host header to the backend application
